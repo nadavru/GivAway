@@ -1,0 +1,115 @@
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.join {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.create-btn {
+  width: 100%;
+}
+
+.footer{
+  position: fixed;
+  text-align: center;
+  bottom: 0px;
+  width: 100%;
+  padding-top: 10x;
+  color: #215820;
+}
+
+.message-box {
+  border-color: #077A98;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 10px;
+  background-color: whitesmoke;
+  height: 75vh;
+  display: flex;
+  flex-direction: column;
+  width: 80vw;
+  align-items: stretch;
+}
+
+.messages {
+  overflow-y: scroll;
+  flex: 1;
+  width: 100%;
+}
+
+.inputs {
+  padding: 10px;
+  display: flex;
+}
+
+h2 {
+  text-align: center;
+}
+
+#message {
+  flex: 1;
+}
+
+.text {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.muted {
+  font-size: 10px;
+  color: darkgray;
+}
+
+.site-logo {
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.footer{
+  position: fixed;
+  text-align: center;
+  bottom: 0px;
+  width: 100%;
+  padding-top: 10x;
+   }
+
+* {
+  font-family: Ogg-Regular, Arial;
+  color: #4870C6;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.login-box {
+  border-color: #077A98;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 10px;
+  background-color: whitesmoke;
+  height: 30vh;
+  flex-direction: column;
+  width: 25vw;
+  align-items: center;
+  margin-top: 70px
+}

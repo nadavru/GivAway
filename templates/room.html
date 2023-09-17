@@ -1,0 +1,164 @@
+{% extends 'base.html' %} 
+{% block content %}
+<div class="message-box">
+  <h2>Zurich Insurance Chat Room: <br> {{name}} - {{room}}</h2>
+  <div class="messages" id="messages"></div>
+  <div class="inputs">
+    <input
+      type="text"
+      rows="3"
+      placeholder="Message"
+      name="message"
+      id="message"
+    />
+    <button type="button" name="send" id="send-btn" onClick="sendMessage()">
+      Send
+    </button>
+    <!-- Added image upload input -->
+    <input type="file" id="image-upload" accept="image/*">
+    <button type="button" name="send-image" id="send-image-btn" onClick="sendImage()">
+      Send Image
+    </button>
+    <!-- Added voice record and stop buttons -->
+    <button type="button" name="record-voice" id="record-voice-btn">
+      Start Recording
+    </button>
+  </div>
+</div>
+<script type="text/javascript">
+  // Initialize media recorder and its event listeners
+  const startRecording = () => {
+    record_btn.removeEventListener("click", startRecording);
+    record_btn.addEventListener("click", stopRecording);
+    record_btn.innerText = "Stop Recording";  // Using innerText to change the button text
+
+    socketio.emit('start_recording');
+  };
+
+  const stopRecording = () => {
+    record_btn.removeEventListener("click", stopRecording);
+    record_btn.addEventListener("click", startRecording);
+    record_btn.innerText = "Start Recording";  // Using innerText to change the button text
+
+    socketio.emit('stop_recording');
+  };
+
+  var record_btn = document.getElementById("record-voice-btn");
+  record_btn.addEventListener("click", startRecording);
+
+  document.addEventListener("keydown", function(event) {
+        // Checking if the "Enter" key was pressed
+        if (event.key === "Enter") {
+          // Clicking the button programmatically
+          document.getElementById("send-btn").click();
+        }
+      });
+        
+</script>
+
+
+<script type="text/javascript">
+  var socketio = io();
+  const messages = document.getElementById("messages");
+
+  // Function to create both text and image messages
+  const createMessage = (type, name, msg) => {
+    let content = "";
+    if (type === 'text') {
+      content = `
+      <div class="text">
+          <span>
+              <strong>${name}</strong>: ${msg}
+          </span>
+          <span class="muted">
+              ${new Date().toLocaleString()}
+          </span>
+      </div>
+      `;
+    } else if (type === 'image') {
+      content = `
+      <div class="image">
+          <span>
+              <strong>${name}</strong>:
+          </span>
+          <img src="${msg}" alt="Image">
+          <span class="muted">
+            ${new Date().toLocaleString()}
+        </span>
+      </div>
+      `;
+      
+    }
+    messages.innerHTML += content;
+  };
+
+  // Function to send image
+  const sendImage = () => {
+  const imageUpload = document.getElementById("image-upload");
+  const file = imageUpload.files[0];
+  const maxWidth = 250; // Define your desired maximum width
+  const maxHeight = 250; // Define your desired maximum height
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.src = e.target.result;
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        let width = img.width;
+        let height = img.height;
+
+        // Resize the image while maintaining its aspect ratio
+        if (width > maxWidth) {
+          const ratio = maxWidth / width;
+          width = maxWidth;
+          height *= ratio;
+        }
+
+        if (height > maxHeight) {
+          const ratio = maxHeight / height;
+          height = maxHeight;
+          width *= ratio;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert the resized canvas back to a data URL
+        const resizedImageData = canvas.toDataURL("image/jpeg"); // You can specify the desired format (e.g., "image/jpeg" or "image/png")
+
+        socketio.emit('send_image', { image_data: resizedImageData });
+      };
+    };
+
+    reader.readAsDataURL(file);
+  }
+};
+
+
+  // Handle incoming messages
+  socketio.on("message", (data) => {
+    createMessage(data.type, data.name, data.message);
+  });
+
+  // Function to send text message
+  const sendMessage = () => {
+    const message = document.getElementById("message");
+    if (message.value === "") return;
+    socketio.emit("message", { data: message.value });
+    message.value = "";
+  };
+</script>
+{% for msg in messages %}
+<script type="text/javascript">
+  createMessage("{{msg.type}}", "{{msg.name}}", "{{msg.message}}");
+</script>
+
+{% endfor %}
+{% endblock %}
